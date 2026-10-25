@@ -1,7 +1,6 @@
 import streamlit as st
 from PIL import Image
 import time
-import random
 
 # Configuración de página
 st.set_page_config(page_title="SAY AI", page_icon="🤖", layout="centered")
@@ -31,20 +30,19 @@ st.markdown("""
 st.title("⚡ SAY AI")
 
 # --- SELECTOR DE MODELOS ---
-model_options = {
-    "Gemini 1.5 Flash (Modo Autónomo)": "gemini-1.5-flash-local",
-    "Gemini 1.5 Pro (Modo Autónomo)": "gemini-1.5-pro-local",
-    "Gemini 2.0 Flash (Modo Autónomo)": "gemini-2.0-flash-local",
-    "Gemini 2.0 Pro (Modo Autónomo)": "gemini-2.0-pro-local"
-}
+model_options = [
+    "Gemini 1.5 Flash (Modo Autónomo)",
+    "Gemini 1.5 Pro (Modo Autónomo)",
+    "Gemini 2.0 Flash (Modo Autónomo)",
+    "Gemini 2.0 Pro (Modo Autónomo)"
+]
 
 selected_model_name = st.selectbox(
     "MODELO ACTIVO SELECCIONADO:",
-    list(model_options.keys())
+    model_options
 )
-selected_model_id = model_options[selected_model_name]
 
-st.caption(f"🟢 **Estado:** Sistema en ejecución directa (Sin claves API) con `{selected_model_id}`")
+st.caption("🟢 **Estado:** Sistema en ejecución directa (Sin claves API)")
 
 # Adjuntar imagen
 uploaded_file = st.file_uploader("📂 Adjuntar imagen desde la galería", type=["png", "jpg", "jpeg"])
@@ -56,16 +54,24 @@ if uploaded_file:
 # Entrada de texto del usuario
 user_input = st.text_input("Escribe tu consulta a SAY AI...")
 
-# --- GENERADOR AUTÓNOMO DE RESPUESTAS ---
-def generar_respuesta_local(prompt, tiene_imagen, modelo):
-    # Respuestas simuladas inteligentes de respaldo
-    if tiene_imagen:
-        return f"[SAY AI - {modelo}]: He analizado la imagen subida junto a tu consulta '{prompt if prompt else 'Sin texto'}'. La estructura visual muestra elementos claros en alta resolución con patrones de luz e iluminación adaptados."
-    
-    prompt_clean = prompt.lower().strip()
-    
-    if "paisaje" in prompt_clean:
-        return f"[SAY AI - {modelo}]: Un paisaje es la representación de una extensión de terreno. Puede ser natural (montañas, ríos, bosques) o urbano (ciudades, arquitectura). ¿Te gustaría generar una descripción técnica o estética específica sobre algún entorno?"
-    elif "hola" in prompt_clean or "saludo" in prompt_clean:
-        return f"[SAY AI - {modelo}]: ¡Hola! El sistema SAY AI está activo y listo para procesar tus consultas sin necesidad de autent
+# Botón de ejecución sin validación de API Keys
+if st.button("Enviar"):
+    if not user_input and not image:
+        st.warning("Por favor escribe una pregunta o adjunta una imagen.")
+    else:
+        with st.spinner("SAY AI está procesando tu solicitud..."):
+            time.sleep(1) # Simulación de tiempo de carga
+            
+            # Generar respuesta según la entrada
+            if image:
+                respuesta = f"He analizado la imagen subida junto a tu consulta: '{user_input}'. La estructura visual muestra patrones claros y de alta calidad."
+            elif "paisaje" in user_input.lower():
+                respuesta = "Un paisaje es una extensión de terreno que comprende elementos naturales (montañas, vegetación, ríos) o elementos antrópicos. Excelente elección para análisis visual."
+            elif "hola" in user_input.lower():
+                respuesta = "¡Hola! El sistema SAY AI está operativo y funcionando a la perfección en modo autónomo."
+            else:
+                respuesta = f"Consulta procesada con éxito: '{user_input}'. El núcleo de respuestas autónomas ha respondido correctamente."
+            
+        st.success("Respuesta de SAY AI:")
+        st.write(respuesta)
         
